@@ -1,0 +1,13 @@
+E:\prj\Task-38\Task-38\bin\Debug\netcoreapp3.1\Task-38.exe
+E:\prj\Task-38\Task-38\bin\Debug\netcoreapp3.1\Task-38.deps.json
+E:\prj\Task-38\Task-38\bin\Debug\netcoreapp3.1\Task-38.runtimeconfig.json
+E:\prj\Task-38\Task-38\bin\Debug\netcoreapp3.1\Task-38.runtimeconfig.dev.json
+E:\prj\Task-38\Task-38\bin\Debug\netcoreapp3.1\Task-38.dll
+E:\prj\Task-38\Task-38\bin\Debug\netcoreapp3.1\Task-38.pdb
+E:\prj\Task-38\Task-38\obj\Debug\netcoreapp3.1\Task-38.csprojAssemblyReference.cache
+E:\prj\Task-38\Task-38\obj\Debug\netcoreapp3.1\Task-38.AssemblyInfoInputs.cache
+E:\prj\Task-38\Task-38\obj\Debug\netcoreapp3.1\Task-38.AssemblyInfo.cs
+E:\prj\Task-38\Task-38\obj\Debug\netcoreapp3.1\Task-38.csproj.CoreCompileInputs.cache
+E:\prj\Task-38\Task-38\obj\Debug\netcoreapp3.1\Task-38.dll
+E:\prj\Task-38\Task-38\obj\Debug\netcoreapp3.1\Task-38.pdb
+E:\prj\Task-38\Task-38\obj\Debug\netcoreapp3.1\Task-38.genruntimeconfig.cache
