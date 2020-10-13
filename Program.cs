@@ -29,8 +29,16 @@ namespace Task_38
                     case 1:
                         int detailNumber = rand.Next(0, details.Length);
                         Car car = new Car(details[detailNumber].NameDetail);
-                        car.ShowBreaking();                        
-                        carservice.ReplaceDetail(storage.SearchDetail(car.Breaking), details[detailNumber].TotalCost);
+                        car.ShowBreaking();
+
+                        if (storage.SearchDetail(car.Breaking) == true)
+                        {
+                            carservice.ReplaceCorrectDetail(details[detailNumber].TotalCost);
+                        }
+                        else
+                        {
+                            carservice.ReplaceIncorrectDetail(details[detailNumber].TotalCost, storage.SearchDetail(carservice.SelectDetail(details)));
+                        }
                         break;
                     case 2:
                         isWork = false;
@@ -53,23 +61,39 @@ namespace Task_38
             Console.WriteLine($"Ваш баланс : {_balans}");
             Console.SetCursorPosition(0, 0);
         }
-        
-        public void ReplaceDetail(int numberChoiceUser, int totalCost)
+
+        public void ReplaceIncorrectDetail(int totalCost, bool isFoundDetail)
         {
-            switch (numberChoiceUser)
+            if(isFoundDetail)
             {
-                case 1:
-                    _balans += totalCost;
-                    break;
-                case 2:
-                    _balans -= totalCost;
-                    Console.WriteLine("Вы заплатили ущерб в размере полной стоимости");
-                    break;
-                case 3:
-                    _balans -= _forfeit;
-                    Console.WriteLine($"Вы заплатили штраф {_forfeit}");
-                    break;
+                _balans -= totalCost;
+                Console.WriteLine($"Вы заплатили ущерб в размере полной стоимости {totalCost}");
             }
+            else
+            {
+                _balans -= _forfeit;
+                Console.WriteLine($"Вы заплатили штраф {_forfeit}");
+            }
+        }
+        public void ReplaceCorrectDetail(int totalCost)
+        {
+            _balans += totalCost;
+        }
+        public string SelectDetail(Detail[] details)
+        {
+            Console.WriteLine("1 - заменить другой деталью\n\n2 - заплатить штраф\n");
+
+            if(Convert.ToInt32(Console.ReadLine()) == 1)
+            {
+                Console.WriteLine("Выберите деталь на которую вы хотите заменить : ");
+
+                for (int i = 0; i < details.Length; i++)
+                {
+                    Console.WriteLine($"{i} - {details[i].NameDetail}");
+                }                
+                return details[Convert.ToInt32(Console.ReadLine())].NameDetail;
+            }
+            return "";            
         }        
     }
     class Storage
@@ -83,29 +107,20 @@ namespace Task_38
                 _details.Add(details[rand.Next(0,details.Length)]);
             }
         }
-        public int SearchDetail(string detailName)
+        public bool SearchDetail(string detailName)
         {
-            Random rand = new Random();
             for (int i = 0; i < _details.Count; i++)
             {
-                if(_details[i].NameDetail == detailName)
+                if (_details[i].NameDetail == detailName)
                 {
                     Console.WriteLine("На складе есть деталь под замену.\n");
                     _details[i].ShowTotalCost();
                     _details.RemoveAt(i);
-                    return 1;
+                    return true;
                 }
             }
             Console.WriteLine("У вас нет этой детали на складе.\n");
-            int randomDetail = rand.Next(0, _details.Count);
-
-            if (Convert.ToInt32(Console.ReadLine()) == 2)
-            {
-                Console.WriteLine($"Вы попробовали заменить {_details[randomDetail].NameDetail} клиент это заметил, теперь вам придется возместить ущерб в размере полной стоимости");
-                _details.RemoveAt(randomDetail);
-                return 2;
-            }
-            return 3;
+            return false;
         }        
         public void ShowInfo()
         {
@@ -136,9 +151,22 @@ namespace Task_38
                         break;
                 }
             }
-            Console.SetCursorPosition(0,15);
-            Console.WriteLine($"У вас на складе осталось :\n\n{wheel} колес\n\n{chock} тормозных колодок\n\n{oilFilter} масляных фильтров\n\n{airFilter} воздушных фильтров\n\n{ball} шаровых");
+            Console.SetCursorPosition(0,50);
+            Console.WriteLine($"У вас на складе осталось : {wheel} колес, {chock} тормозных колодок, {oilFilter} масляных фильтров, {airFilter} воздушных фильтров, {ball} шаровых");
             Console.SetCursorPosition(0,0);
+        }
+        public bool CheckDetail(int numberDetail, Detail[] details)
+        {
+            for (int i = 0; i < _details.Count; i++)
+            {
+                if(_details[i].NameDetail == details[numberDetail].NameDetail)
+                {
+                    _details.RemoveAt(i);
+                    Console.WriteLine("На складе есть деталь под замену.\n");
+                    return true;
+                }
+            }
+            return false;
         }
     }
     
