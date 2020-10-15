@@ -28,16 +28,21 @@ namespace Task_38
                 {
                     case 1:
                         int detailNumber = rand.Next(0, details.Length);
-                        Car car = new Car(details[detailNumber].NameDetail);
+                        Car car = new Car(details[detailNumber]);
                         car.ShowBreaking();
 
-                        if (storage.SearchDetail(car.Breaking) == true)
+                        if (storage.SearchDetail(car.Broken) != null)
                         {
-                            carservice.ReplaceCorrectDetail(details[detailNumber].TotalCost);
+                            carservice.ReplaceCorrectDetail(details[detailNumber]);
+                            details[detailNumber].ShowTotalCost();
+                            storage.DeleteDetail(car.Broken);
                         }
                         else
-                        {
-                            carservice.ReplaceIncorrectDetail(details[detailNumber].TotalCost, storage.SearchDetail(carservice.SelectDetail(details)));
+                        {                           
+                            Detail uncorrectDetail = storage.SearchDetail(carservice.SelectDetail(details));
+                            uncorrectDetail.ShowTotalCost();
+                            carservice.ReplaceUncorrectDetail(uncorrectDetail);
+                            storage.DeleteDetail(uncorrectDetail);
                         }
                         break;
                     case 2:
@@ -48,7 +53,6 @@ namespace Task_38
                 Console.ReadKey();
                 Console.Clear();
             }
-
         }
     }
     class CarService
@@ -62,12 +66,12 @@ namespace Task_38
             Console.SetCursorPosition(0, 0);
         }
 
-        public void ReplaceIncorrectDetail(int totalCost, bool isFoundDetail)
+        public void ReplaceUncorrectDetail(Detail detail)
         {
-            if(isFoundDetail)
+            if(detail != null)
             {
-                _balans -= totalCost;
-                Console.WriteLine($"Вы заплатили ущерб в размере полной стоимости {totalCost}");
+                _balans -= detail.TotalCost;
+                Console.WriteLine($"Вы заплатили ущерб в размере полной стоимости {detail.TotalCost}");
             }
             else
             {
@@ -75,11 +79,11 @@ namespace Task_38
                 Console.WriteLine($"Вы заплатили штраф {_forfeit}");
             }
         }
-        public void ReplaceCorrectDetail(int totalCost)
+        public void ReplaceCorrectDetail(Detail detail)
         {
-            _balans += totalCost;
+            _balans += detail.TotalCost;
         }
-        public string SelectDetail(Detail[] details)
+        public Detail SelectDetail(Detail[] details)
         {
             Console.WriteLine("1 - заменить другой деталью\n\n2 - заплатить штраф\n");
 
@@ -90,10 +94,11 @@ namespace Task_38
                 for (int i = 0; i < details.Length; i++)
                 {
                     Console.WriteLine($"{i} - {details[i].NameDetail}");
-                }                
-                return details[Convert.ToInt32(Console.ReadLine())].NameDetail;
+                }
+
+                return details[Convert.ToInt32(Console.ReadLine())];
             }
-            return "";            
+            return null;            
         }        
     }
     class Storage
@@ -106,21 +111,19 @@ namespace Task_38
             {
                 _details.Add(details[rand.Next(0,details.Length)]);
             }
-        }
-        public bool SearchDetail(string detailName)
+        }        
+        public Detail SearchDetail(Detail detail)
         {
             for (int i = 0; i < _details.Count; i++)
             {
-                if (_details[i].NameDetail == detailName)
+                if (_details[i].NameDetail == detail.NameDetail)
                 {
-                    Console.WriteLine("На складе есть деталь под замену.\n");
-                    _details[i].ShowTotalCost();
-                    _details.RemoveAt(i);
-                    return true;
+                    Console.WriteLine("На складе есть деталь под замену.\n");                    
+                    return _details[i];
                 }
             }
             Console.WriteLine("У вас нет этой детали на складе.\n");
-            return false;
+            return null;
         }        
         public void ShowInfo()
         {
@@ -155,38 +158,47 @@ namespace Task_38
             Console.WriteLine($"У вас на складе осталось : {wheel} колес, {chock} тормозных колодок, {oilFilter} масляных фильтров, {airFilter} воздушных фильтров, {ball} шаровых");
             Console.SetCursorPosition(0,0);
         }
-        public bool CheckDetail(int numberDetail, Detail[] details)
+        public bool CheckDetail(Detail detail)
         {
             for (int i = 0; i < _details.Count; i++)
             {
-                if(_details[i].NameDetail == details[numberDetail].NameDetail)
+                if(_details[i].NameDetail == detail.NameDetail)
                 {
-                    _details.RemoveAt(i);
                     Console.WriteLine("На складе есть деталь под замену.\n");
                     return true;
                 }
             }
             return false;
         }
+        public void DeleteDetail(Detail detail)
+        {
+            for (int i = 0; i < _details.Count; i++)
+            {
+                if(_details[i].NameDetail == detail.NameDetail)
+                {
+                    _details.RemoveAt(i);
+                }
+            }
+        }
     }
     
     class Car
     {
-        private string _breaking;
-        public string Breaking
+        private Detail _broken;
+        public Detail Broken
         {
             get
             {
-                return _breaking;
+                return _broken;
             }
         }
-        public Car(string breaking)
+        public Car(Detail breakingDetail)
         {
-            _breaking = breaking;
+            _broken = breakingDetail;
         }        
         public void ShowBreaking()
         {
-            Console.WriteLine($"У автомобиля нужно заменить {_breaking}.");
+            Console.WriteLine($"У автомобиля нужно заменить {_broken.NameDetail}.");
         }
     }
     abstract class Detail
@@ -194,7 +206,7 @@ namespace Task_38
         protected int Price;
         protected string Name;
         protected int PayForChange;
-        private int _totalCost;
+        private int _totalCost = 0;
         public string NameDetail
         {
             get
@@ -209,11 +221,11 @@ namespace Task_38
                 return _totalCost;
             }
         }
-        public Detail(string name, int price, int payForWork)
+        public Detail(string name, int price, int payForChange)
         {
             Name = name;
             Price = price;
-            PayForChange = payForWork;
+            PayForChange = payForChange;
             _totalCost += Price + PayForChange;
         }
         public void ShowTotalCost()
